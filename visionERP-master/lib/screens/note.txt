@@ -1,0 +1,2 @@
+this is for all the screens devided by folders for management
+add more folders if needed
