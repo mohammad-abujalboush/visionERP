@@ -13,60 +13,85 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   String _currentPage = 'dashboard';
-  
+  String? _selectedTitle;
+
   // Animation controllers
   late AnimationController _sidebarAnimationController;
   late Animation<double> _sidebarWidthAnimation;
   late Animation<double> _sidebarOpacityAnimation;
-  
+
   bool _isSidebarVisible = true;
-  
+
   // Remove the getters and use methods instead
-  bool isSmallScreen(BuildContext context) => MediaQuery.of(context).size.width < 768;
-  bool isVerySmallScreen(BuildContext context) => MediaQuery.of(context).size.width < 480;
+  bool isSmallScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width < 768;
+  bool isVerySmallScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width < 480;
+
+  late Animation<Offset> _fabSlide;
+  late Animation<double> _fabFade;
 
   @override
   void initState() {
     super.initState();
-    
-    // Initialize animation controller
     _sidebarAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
-    // We'll set up the animations in didChangeDependencies instead
+
+    // FAB is visible when sidebar is OPEN (controller = 1)
+    _fabFade = CurvedAnimation(
+      parent: _sidebarAnimationController,
+      curve: Curves.easeOut, // 0 -> 1 as drawer opens
+    );
+
+    // When closing (1 -> 0) FAB slides right and disappears
+    _fabSlide =
+        Tween<Offset>(
+          begin: const Offset(0.35, 0.0), // slightly to the right when hidden
+          end: Offset.zero, // in place when visible (open)
+        ).animate(
+          CurvedAnimation(
+            parent: _sidebarAnimationController,
+            curve: Curves.easeInOut,
+          ),
+        );
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
-    // Setup animations here after dependencies are available
-    final screenWidth = MediaQuery.of(context).size.width;
-    final targetWidth = screenWidth < 768 ? 220.0 : 280.0;
-    
-    _sidebarWidthAnimation = Tween<double>(
-      begin: 0.0,
-      end: targetWidth,
-    ).animate(CurvedAnimation(
-      parent: _sidebarAnimationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _sidebarOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _sidebarAnimationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    // Start with sidebar visible
-    _sidebarAnimationController.forward();
+
+    final small = isSmallScreen(context);
+    final targetWidth = small ? 260.0 : 280.0;
+
+    _sidebarWidthAnimation = Tween<double>(begin: 0.0, end: targetWidth)
+        .animate(
+          CurvedAnimation(
+            parent: _sidebarAnimationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+
+    _sidebarOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _sidebarAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    // Phones start closed; large screens start open.
+    if (small) {
+      _isSidebarVisible = false;
+      _sidebarAnimationController.value = 0.0;
+    } else {
+      _isSidebarVisible = true;
+      _sidebarAnimationController.value = 1.0;
+    }
   }
 
   @override
@@ -88,54 +113,126 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
+    final small = isSmallScreen(context); // < 768
+    final sidebarTargetWidth = small ? 260.0 : 280.0;
+
     return Scaffold(
       backgroundColor: AppTheme.white,
-      body: Row(
-        children: [
-          // Animated Sidebar - only show if not very small screen
-          if (!isVerySmallScreen(context)) _buildAnimatedSidebar(context),
-          Expanded(child: _buildMainContent(context)),
-        ],
-      ),
-      // Floating action button to toggle sidebar on small screens
-      floatingActionButton: isSmallScreen(context) && !isVerySmallScreen(context) 
-          ? FloatingActionButton(
-              mini: true,
-              backgroundColor: AppTheme.matisse,
-              onPressed: _toggleSidebar,
-              child: AnimatedIcon(
-                icon: AnimatedIcons.menu_close,
-                progress: _sidebarAnimationController,
-                color: AppTheme.athensGray,
-              ),
+      body: small
+          // ---- PHONE: overlay drawer, content full width ----
+          ? Stack(
+              children: [
+                // Main content always fills
+                Positioned.fill(child: _buildMainContent(context)),
+
+                // Scrim when sidebar is visible
+                // scrim (stays below the sidebar in the Stack)
+                if (_isSidebarVisible)
+                  Positioned.fill(
+                    child: GestureDetector(
+                      onTap: _toggleSidebar, // close only when tapping outside
+                      child: AnimatedBuilder(
+                        animation: _sidebarAnimationController,
+                        builder: (_, __) => Container(
+                          color: Colors.black.withOpacity(
+                            0.4 * _sidebarOpacityAnimation.value,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                // Overlay sidebar sliding from left
+                // inside the Stack -> overlay sidebar block
+                AnimatedBuilder(
+                  animation: _sidebarAnimationController,
+                  builder: (_, __) {
+                    final w = _sidebarWidthAnimation.value;
+                    final sidebarTargetWidth = isSmallScreen(context)
+                        ? 260.0
+                        : 280.0;
+
+                    return Positioned(
+                      top: 0,
+                      bottom: 0,
+                      left: -sidebarTargetWidth + w, // slide in from left
+                      width: sidebarTargetWidth,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque, // <- consume taps
+                        onTap: () {}, // <- do nothing
+                        child: Material(
+                          elevation: 12,
+                          color: Colors.transparent,
+                          child: Opacity(
+                            opacity: _sidebarOpacityAnimation.value,
+                            child: _buildSidebarSurface(
+                              context,
+                              sidebarTargetWidth,
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
+            )
+          // ---- DESKTOP/TABLET: persistent sidebar in a Row ----
+          : Row(
+              children: [
+                SizedBox(
+                  width: sidebarTargetWidth,
+                  child: _buildSidebarSurface(context, sidebarTargetWidth),
+                ),
+                Expanded(child: _buildMainContent(context)),
+              ],
+            ),
+
+      // Show FAB on all small screens (including very small)
+      floatingActionButton: isSmallScreen(context)
+          ? AnimatedBuilder(
+              animation: _sidebarAnimationController,
+              builder: (_, __) {
+                final isOpen = _sidebarAnimationController.value > 0.0;
+                return IgnorePointer(
+                  ignoring: !isOpen, // disable taps when hidden/closed
+                  child: FadeTransition(
+                    opacity: _fabFade, // 0 when closed, 1 when open
+                    child: SlideTransition(
+                      position: _fabSlide, // from right -> in place as it opens
+                      child: FloatingActionButton(
+                        mini: true,
+                        backgroundColor: AppTheme.matisse,
+                        onPressed: _toggleSidebar,
+                        child: AnimatedIcon(
+                          icon: AnimatedIcons.menu_close,
+                          progress: _sidebarAnimationController,
+                          color: AppTheme.athensGray,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
             )
           : null,
     );
   }
 
-  Widget _buildAnimatedSidebar(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _sidebarAnimationController,
-      builder: (context, child) {
-        return Container(
-          width: _sidebarWidthAnimation.value,
-          decoration: BoxDecoration(
-            color: AppTheme.matisse,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 8,
-                offset: const Offset(2, 0),
-              ),
-            ],
+  Widget _buildSidebarSurface(BuildContext context, double sidebarWidth) {
+    return Container(
+      width: sidebarWidth,
+      decoration: BoxDecoration(
+        color: AppTheme.matisse,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 12,
+            offset: const Offset(2, 0),
           ),
-          child: Opacity(
-            opacity: _sidebarOpacityAnimation.value,
-            child: child,
-          ),
-        );
-      },
-      child: _buildSidebarContent(context),
+        ],
+      ),
+      child: _buildSidebarContent(context), // your existing content function
     );
   }
 
@@ -196,7 +293,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               ],
             ),
           ),
-          
+
           // Main sidebar content with scroll
           Expanded(
             child: Column(
@@ -223,11 +320,14 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           }
                         },
                       ),
-                      
+
                       // Notifications
                       _buildSidebarItemWidget(
                         context,
-                        SidebarItem(title: 'Notifications', icon: Icons.notifications),
+                        SidebarItem(
+                          title: 'Notifications',
+                          icon: Icons.notifications,
+                        ),
                         0,
                         isSelected: _currentPage == 'notifications',
                         onTap: () {
@@ -240,26 +340,31 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           }
                         },
                       ),
-                      
+
                       // Divider line
                       Container(
                         margin: EdgeInsets.symmetric(vertical: 8),
                         height: 1,
                         color: AppTheme.athensGray.withOpacity(0.3),
                       ),
-                      
+
                       // Main menu items
-                      ..._buildSidebarItems(context, SidebarProvider.getSidebarItems().sublist(2)),
+                      ..._buildSidebarItems(
+                        context,
+                        SidebarProvider.getSidebarItems().sublist(2),
+                      ),
                     ],
                   ),
                 ),
-                
+
                 // Bottom section - Profile and Logout
                 Container(
                   padding: EdgeInsets.all(isSmallScreen(context) ? 8 : 12),
                   decoration: BoxDecoration(
                     border: Border(
-                      top: BorderSide(color: AppTheme.athensGray.withOpacity(0.3)),
+                      top: BorderSide(
+                        color: AppTheme.athensGray.withOpacity(0.3),
+                      ),
                     ),
                   ),
                   child: Column(
@@ -277,7 +382,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           }
                         },
                       ),
-                      
+
                       // Logout
                       _buildSidebarItemWidget(
                         context,
@@ -302,24 +407,38 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildSidebarItemWidget(BuildContext context, SidebarItem item, int level, {bool isSelected = false, required VoidCallback onTap}) {
+  Widget _buildSidebarItemWidget(
+    BuildContext context,
+    SidebarItem item,
+    int level, {
+    bool isSelected = false,
+    required VoidCallback onTap,
+  }) {
     return AnimatedContainer(
       duration: Duration(milliseconds: 200),
-      margin: EdgeInsets.only(left: level * (isSmallScreen(context) ? 12.0 : 16.0)),
+      margin: EdgeInsets.only(
+        left: level * (isSmallScreen(context) ? 12.0 : 16.0),
+      ),
       decoration: BoxDecoration(
-        color: isSelected ? AppTheme.matisse.withOpacity(0.3) : Colors.transparent,
+        color: isSelected
+            ? AppTheme.matisse.withOpacity(0.3)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
         leading: Icon(
           item.icon,
-          color: isSelected ? AppTheme.athensGray : AppTheme.athensGray.withOpacity(0.7),
+          color: isSelected
+              ? AppTheme.athensGray
+              : AppTheme.athensGray.withOpacity(0.7),
           size: isSmallScreen(context) ? 18 : 20,
         ),
         title: AnimatedDefaultTextStyle(
           duration: Duration(milliseconds: 200),
           style: TextStyle(
-            color: isSelected ? AppTheme.athensGray : AppTheme.athensGray.withOpacity(0.8),
+            color: isSelected
+                ? AppTheme.athensGray
+                : AppTheme.athensGray.withOpacity(0.8),
             fontFamily: 'Cairo',
             fontSize: isSmallScreen(context) ? 13 : 14,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -327,14 +446,20 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           child: Text(item.title),
         ),
         onTap: onTap,
-        contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen(context) ? 8 : 12),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen(context) ? 8 : 12,
+        ),
         minLeadingWidth: 0,
         dense: isSmallScreen(context),
       ),
     );
   }
 
-  List<Widget> _buildSidebarItems(BuildContext context, List<SidebarItem> items, {int level = 0}) {
+  List<Widget> _buildSidebarItems(
+    BuildContext context,
+    List<SidebarItem> items, {
+    int level = 0,
+  }) {
     List<Widget> widgets = [];
 
     for (var item in items) {
@@ -343,15 +468,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           item: item,
           level: level,
           isSelected: _selectedIndex == items.indexOf(item) + 2,
-          onTap: () {
+          onTap: () {}, // parent expand handled inside widget
+          onLeafTap: (leaf) {
             setState(() {
-              _selectedIndex = items.indexOf(item) + 2;
+              _selectedIndex =
+                  items.indexOf(item) + 2; // keep your index scheme
               _currentPage = 'menu';
+              _selectedTitle = leaf.title; // show the leaf title
             });
-            // Auto-close sidebar on small screens
-            if (isSmallScreen(context)) {
-              _toggleSidebar();
-            }
+            if (isSmallScreen(context))
+              _toggleSidebar(); // close overlay on phones
           },
         ),
       );
@@ -365,7 +491,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       children: [
         Container(
           height: isVerySmallScreen(context) ? 60 : 80,
-          padding: EdgeInsets.symmetric(horizontal: isVerySmallScreen(context) ? 16 : 24),
+          padding: EdgeInsets.symmetric(
+            horizontal: isVerySmallScreen(context) ? 16 : 24,
+          ),
           decoration: BoxDecoration(
             color: AppTheme.white,
             boxShadow: [
@@ -380,24 +508,23 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Menu button to toggle sidebar
-              if (!isVerySmallScreen(context))
-                IconButton(
-                  icon: AnimatedIcon(
-                    icon: AnimatedIcons.menu_close,
-                    progress: _sidebarAnimationController,
-                    size: isSmallScreen(context) ? 20 : 24,
-                    color: AppTheme.matisse,
-                  ),
-                  onPressed: _toggleSidebar,
+              IconButton(
+                icon: AnimatedIcon(
+                  icon: AnimatedIcons.menu_close,
+                  progress: _sidebarAnimationController,
+                  size: isSmallScreen(context) ? 20 : 24,
+                  color: AppTheme.matisse,
                 ),
-              
+                onPressed: _toggleSidebar,
+              ),
+
               Expanded(
                 child: Text(
                   _getPageTitle(),
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                        fontFamily: 'Cairo',
-                        fontSize: isVerySmallScreen(context) ? 18 : 20,
-                      ),
+                    fontFamily: 'Cairo',
+                    fontSize: isVerySmallScreen(context) ? 18 : 20,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -438,9 +565,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget _buildProfileMenu(BuildContext context) {
     return PopupMenuButton<String>(
       offset: Offset(0, 50),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
           value: 'profile',
@@ -450,10 +575,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               SizedBox(width: 8),
               Text(
                 'Profile',
-                style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 14,
-                ),
+                style: TextStyle(fontFamily: 'Cairo', fontSize: 14),
               ),
             ],
           ),
@@ -511,11 +633,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       case 'notifications':
         return 'Notifications';
       case 'menu':
-        final items = SidebarProvider.getSidebarItems();
-        if (_selectedIndex >= 0 && _selectedIndex < items.length) {
-          return items[_selectedIndex].title;
-        }
-        return 'Dashboard';
+        return _selectedTitle ?? 'Dashboard'; // <- use leaf title
       default:
         return 'Dashboard';
     }
@@ -606,7 +724,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           // Statistics Cards
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = isVerySmallScreen(context) ? 2 : (isSmallScreen(context) ? 3 : 4);
+              final crossAxisCount = isVerySmallScreen(context)
+                  ? 2
+                  : (isSmallScreen(context) ? 3 : 4);
               return GridView.count(
                 crossAxisCount: crossAxisCount,
                 shrinkWrap: true,
@@ -615,10 +735,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 mainAxisSpacing: isVerySmallScreen(context) ? 12 : 16,
                 childAspectRatio: isVerySmallScreen(context) ? 1.2 : 1.1,
                 children: [
-                  _buildStatCard(context, 'إجمالي المبيعات', '١٢٥,٠٠٠ ر.س', Icons.shopping_cart, AppTheme.diSerria),
-                  _buildStatCard(context, 'إجمالي العملاء', '٤٨٥', Icons.people, AppTheme.matisse),
-                  _buildStatCard(context, 'الطلبات الجديدة', '٣٤', Icons.inventory, AppTheme.hippieBlue),
-                  _buildStatCard(context, 'الموردين', '٨٩', Icons.handshake, Colors.purple),
+                  _buildStatCard(
+                    context,
+                    'إجمالي المبيعات',
+                    '١٢٥,٠٠٠ ر.س',
+                    Icons.shopping_cart,
+                    AppTheme.diSerria,
+                  ),
+                  _buildStatCard(
+                    context,
+                    'إجمالي العملاء',
+                    '٤٨٥',
+                    Icons.people,
+                    AppTheme.matisse,
+                  ),
+                  _buildStatCard(
+                    context,
+                    'الطلبات الجديدة',
+                    '٣٤',
+                    Icons.inventory,
+                    AppTheme.hippieBlue,
+                  ),
+                  _buildStatCard(
+                    context,
+                    'الموردين',
+                    '٨٩',
+                    Icons.handshake,
+                    Colors.purple,
+                  ),
                 ],
               );
             },
@@ -632,7 +776,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: EdgeInsets.all(isVerySmallScreen(context) ? 12 : 16),
       decoration: BoxDecoration(
@@ -665,19 +815,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           Text(
             value,
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  fontFamily: 'Cairo',
-                  fontWeight: FontWeight.bold,
-                  fontSize: isVerySmallScreen(context) ? 16 : 18,
-                ),
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.bold,
+              fontSize: isVerySmallScreen(context) ? 16 : 18,
+            ),
           ),
           SizedBox(height: isVerySmallScreen(context) ? 2 : 4),
           Text(
             title,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontFamily: 'Cairo',
-                  color: Colors.grey[600],
-                  fontSize: isVerySmallScreen(context) ? 12 : 14,
-                ),
+              fontFamily: 'Cairo',
+              color: Colors.grey[600],
+              fontSize: isVerySmallScreen(context) ? 12 : 14,
+            ),
           ),
         ],
       ),
@@ -691,9 +841,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         Text(
           'التقارير والإحصائيات',
           style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                fontFamily: 'Cairo',
-                fontSize: isVerySmallScreen(context) ? 18 : 20,
-              ),
+            fontFamily: 'Cairo',
+            fontSize: isVerySmallScreen(context) ? 18 : 20,
+          ),
         ),
         SizedBox(height: isVerySmallScreen(context) ? 12 : 16),
         if (isVerySmallScreen(context)) ..._buildVerticalCharts(context),
@@ -718,17 +868,37 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return [
       Row(
         children: [
-          Expanded(child: _buildChartContainer(context, 'مبيعات الشهر', AppTheme.diSerria)),
+          Expanded(
+            child: _buildChartContainer(
+              context,
+              'مبيعات الشهر',
+              AppTheme.diSerria,
+            ),
+          ),
           SizedBox(width: isSmallScreen(context) ? 12 : 16),
-          Expanded(child: _buildChartContainer(context, 'توزيع العملاء', AppTheme.matisse)),
+          Expanded(
+            child: _buildChartContainer(
+              context,
+              'توزيع العملاء',
+              AppTheme.matisse,
+            ),
+          ),
         ],
       ),
       SizedBox(height: isSmallScreen(context) ? 12 : 16),
       Row(
         children: [
-          Expanded(child: _buildChartContainer(context, 'المشتريات', AppTheme.hippieBlue)),
+          Expanded(
+            child: _buildChartContainer(
+              context,
+              'المشتريات',
+              AppTheme.hippieBlue,
+            ),
+          ),
           SizedBox(width: isSmallScreen(context) ? 12 : 16),
-          Expanded(child: _buildChartContainer(context, 'المخزون', Colors.purple)),
+          Expanded(
+            child: _buildChartContainer(context, 'المخزون', Colors.purple),
+          ),
         ],
       ),
     ];
@@ -755,10 +925,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           Text(
             title,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontFamily: 'Cairo',
-                  fontWeight: FontWeight.bold,
-                  fontSize: isVerySmallScreen(context) ? 14 : 16,
-                ),
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.bold,
+              fontSize: isVerySmallScreen(context) ? 14 : 16,
+            ),
           ),
           SizedBox(height: isVerySmallScreen(context) ? 12 : 16),
           Expanded(
@@ -792,13 +962,15 @@ class _SidebarItemWidget extends StatefulWidget {
   final SidebarItem item;
   final int level;
   final bool isSelected;
-  final VoidCallback onTap;
+  final VoidCallback onTap; // (unused for leaves, keep for compat)
+  final ValueChanged<SidebarItem> onLeafTap; // <-- add this
 
   const _SidebarItemWidget({
     required this.item,
     required this.level,
     required this.isSelected,
     required this.onTap,
+    required this.onLeafTap, // <-- add this
   });
 
   @override
@@ -816,24 +988,34 @@ class __SidebarItemWidgetState extends State<_SidebarItemWidget> {
       children: [
         AnimatedContainer(
           duration: Duration(milliseconds: 200),
-          margin: EdgeInsets.only(left: widget.level * (isSmallScreen ? 12.0 : 16.0)),
+          margin: EdgeInsets.only(
+            left: widget.level * (isSmallScreen ? 12.0 : 16.0),
+          ),
           decoration: BoxDecoration(
-            color: widget.isSelected ? AppTheme.matisse.withOpacity(0.3) : Colors.transparent,
+            color: widget.isSelected
+                ? AppTheme.matisse.withOpacity(0.3)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: ListTile(
             leading: Icon(
               widget.item.icon,
-              color: widget.isSelected ? AppTheme.athensGray : AppTheme.athensGray.withOpacity(0.7),
+              color: widget.isSelected
+                  ? AppTheme.athensGray
+                  : AppTheme.athensGray.withOpacity(0.7),
               size: isSmallScreen ? 18 : 20,
             ),
             title: AnimatedDefaultTextStyle(
               duration: Duration(milliseconds: 200),
               style: TextStyle(
-                color: widget.isSelected ? AppTheme.athensGray : AppTheme.athensGray.withOpacity(0.8),
+                color: widget.isSelected
+                    ? AppTheme.athensGray
+                    : AppTheme.athensGray.withOpacity(0.8),
                 fontFamily: 'Cairo',
                 fontSize: isSmallScreen ? 13 : 14,
-                fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                fontWeight: widget.isSelected
+                    ? FontWeight.bold
+                    : FontWeight.normal,
               ),
               child: Text(widget.item.title),
             ),
@@ -845,14 +1027,19 @@ class __SidebarItemWidgetState extends State<_SidebarItemWidget> {
                   )
                 : null,
             onTap: () {
-              if (widget.item.children != null) {
-                setState(() {
-                  _isExpanded = !_isExpanded;
-                });
+              if (widget.item.children != null &&
+                  widget.item.children!.isNotEmpty) {
+                // Parent: just expand/collapse
+                setState(() => _isExpanded = !_isExpanded);
+              } else {
+                // Leaf: notify HomePage
+                widget.onLeafTap(widget.item);
               }
-              widget.onTap();
             },
-            contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8 : 12),
+
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: isSmallScreen ? 8 : 12,
+            ),
             minLeadingWidth: 0,
             dense: isSmallScreen,
           ),
@@ -863,7 +1050,8 @@ class __SidebarItemWidgetState extends State<_SidebarItemWidget> {
               item: child,
               level: widget.level + 1,
               isSelected: false,
-              onTap: () {},
+              onTap: () {}, // not used for leaves
+              onLeafTap: widget.onLeafTap, // <-- pass through
             ),
           ),
       ],
