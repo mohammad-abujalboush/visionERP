@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:vision_website/main.dart';
-import 'package:vision_website/screens/app/theme_provider.dart';
-
+import 'package:vision_website/screens/app/home_page.dart';
+import 'package:vision_website/screens/app/providers/theme_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -21,25 +20,23 @@ class _LoginPageState extends State<LoginPage> {
     final theme = Theme.of(context);
     
     return Scaffold(
-      body: Container(
-        decoration: AppTheme.gradientBackground,
-        child: SafeArea(
-          child: Center(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(20.0),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 400),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    _buildLogoSection(theme),
-                    const SizedBox(height: 40),
-                    _buildLoginForm(theme),
-                    const SizedBox(height: 30),
-                    _buildAdditionalOptions(theme),
-                  ],
-                ),
+      backgroundColor: AppTheme.athensGray, // Changed background to athensGray
+      body: SafeArea(
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20.0),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildLogoSection(theme),
+                  const SizedBox(height: 40),
+                  _buildLoginForm(theme),
+                  const SizedBox(height: 30),
+                  _buildAdditionalOptions(theme),
+                ],
               ),
             ),
           ),
@@ -54,26 +51,32 @@ class _LoginPageState extends State<LoginPage> {
         Container(
           width: 80,
           height: 80,
-          decoration: const BoxDecoration(
-            color: AppTheme.oxfordBlue,
+          decoration: BoxDecoration(
+            color: AppTheme.matisse, // Changed to matisse color
             shape: BoxShape.circle,
           ),
-          child: const Icon(
+          child: Icon(
             Icons.person,
-            color: AppTheme.white,
+            color: AppTheme.athensGray, // White icon on blue background
             size: 40,
           ),
         ),
         const SizedBox(height: 20),
         Text(
           'Login',
-          style: theme.textTheme.displayLarge,
+          style: TextStyle(
+            color: AppTheme.matisse, // Changed to matisse color
+            fontFamily: 'Cairo',
+            fontSize: 28,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 10),
         Text(
           'Login into your account',
-          style: theme.textTheme.bodyLarge?.copyWith(
-            color: AppTheme.oxfordBlue.withOpacity(0.7),
+          style: TextStyle(
+            color: AppTheme.matisse.withOpacity(0.7), // Changed to matisse color
+            fontFamily: 'Cairo',
           ),
         ),
       ],
@@ -84,7 +87,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppTheme.white,
+        color: AppTheme.athensGray, // Changed to athensGray
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -102,10 +105,24 @@ class _LoginPageState extends State<LoginPage> {
               controller: _userNameController,
               decoration: InputDecoration(
                 labelText: 'User Name',
-                labelStyle: theme.textTheme.bodyLarge,
-                prefixIcon: Icon(Icons.person, color: AppTheme.iconColor),
-                border: theme.inputDecorationTheme.border,
-                focusedBorder: theme.inputDecorationTheme.focusedBorder,
+                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                  color: AppTheme.mako, // Dark text color
+                ),
+                prefixIcon: Icon(Icons.person, color: AppTheme.matisse), // matisse icon
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppTheme.silverSand),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppTheme.silverSand),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppTheme.matisse, width: 2), // matisse border
+                ),
+                filled: true,
+                fillColor: AppTheme.athensGray,
               ),
               keyboardType: TextInputType.emailAddress,
               validator: (value) {
@@ -123,10 +140,24 @@ class _LoginPageState extends State<LoginPage> {
               controller: _passwordController,
               decoration: InputDecoration(
                 labelText: 'Password',
-                labelStyle: theme.textTheme.bodyLarge,
-                prefixIcon: Icon(Icons.lock, color: AppTheme.iconColor),
-                border: theme.inputDecorationTheme.border,
-                focusedBorder: theme.inputDecorationTheme.focusedBorder,
+                labelStyle: theme.textTheme.bodyLarge?.copyWith(
+                  color: AppTheme.mako, // Dark text color
+                ),
+                prefixIcon: Icon(Icons.lock, color: AppTheme.matisse), // matisse icon
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppTheme.silverSand),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppTheme.silverSand),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: AppTheme.matisse, width: 2), // matisse border
+                ),
+                filled: true,
+                fillColor: AppTheme.athensGray,
               ),
               obscureText: true,
               validator: (value) {
@@ -154,19 +185,30 @@ class _LoginPageState extends State<LoginPage> {
                         _rememberMe = value ?? false;
                       });
                     },
+                    fillColor: WidgetStateProperty.resolveWith<Color>((states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return AppTheme.diSerria; // diSerria when checked
+                      }
+                      return AppTheme.silverSand;
+                    }),
                   ),
                 ),
                 Text(
                   'Remember me',
-                  style: theme.textTheme.bodyMedium,
+                  style: TextStyle(
+                    color: AppTheme.mako, // Dark text color
+                    fontFamily: 'Cairo',
+                  ),
                 ),
                 const Spacer(),
                 GestureDetector(
                   onTap: _showForgotPasswordDialog,
                   child: Text(
                     'Forgot Password?',
-                    style: theme.textTheme.bodyMedium?.copyWith(
+                    style: TextStyle(
                       fontWeight: FontWeight.w500,
+                      color: AppTheme.matisse, // matisse color
+                      fontFamily: 'Cairo',
                     ),
                   ),
                 ),
@@ -176,9 +218,30 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 25),
             
             // Login Button
-            ElevatedButton(
-              onPressed: _login,
-              child: const Text('Login'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.diSerria, // diSerria button color
+                  foregroundColor: AppTheme.athensGray,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 2,
+                  minimumSize: const Size(double.infinity, 50),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                onPressed: _login,
+                child: Text(
+                  'Login',
+                  style: TextStyle(
+                    color: AppTheme.athensGray,
+                    fontFamily: 'Cairo',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
           ],
         ),
@@ -196,7 +259,7 @@ class _LoginPageState extends State<LoginPage> {
             Text(
               "Don't have an account? ",
               style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppTheme.oxfordBlue.withOpacity(0.7),
+                color: AppTheme.mako.withOpacity(0.7), // Dark text color
               ),
             ),
             GestureDetector(
@@ -205,6 +268,7 @@ class _LoginPageState extends State<LoginPage> {
                 'Register',
                 style: theme.textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.bold,
+                  color: AppTheme.matisse, // matisse color
                 ),
               ),
             ),
@@ -216,24 +280,15 @@ class _LoginPageState extends State<LoginPage> {
 
   void _login() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Show loading
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-
-      // Simulate login process
       Future.delayed(const Duration(seconds: 2), () {
-        Navigator.of(context).pop(); // Close loading
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const MyHomePage(title: 'Vision ERP Dashboard'),
-          ),
-        );
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const HomePage(title: 'Vision ERP Dashboard'),
+            ),
+          );
+        }
       });
     }
   }
@@ -244,11 +299,15 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => AlertDialog(
         title: Text(
           'Forgot Password',
-          style: Theme.of(context).textTheme.displayMedium,
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+            color: AppTheme.mako,
+          ),
         ),
         content: Text(
           'This will be a link to reset your password.',
-          style: Theme.of(context).textTheme.bodyMedium,
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppTheme.jumbo,
+          ),
         ),
         actions: [
           TextButton(
@@ -256,7 +315,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Text(
               'OK',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.oxfordBlue,
+                color: AppTheme.matisse,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -272,11 +331,15 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => AlertDialog(
         title: Text(
           'Registration',
-          style: Theme.of(context).textTheme.displayMedium,
+          style: Theme.of(context).textTheme.displayMedium?.copyWith(
+            color: AppTheme.mako,
+          ),
         ),
         content: Text(
-          'Please contact your administrator to create a new account.',
-          style: Theme.of(context).textTheme.bodyMedium,
+          'Please fill in the required fields to register a new account.',
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+            color: AppTheme.jumbo,
+          ),
         ),
         actions: [
           TextButton(
@@ -284,7 +347,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Text(
               'OK',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppTheme.oxfordBlue,
+                color: AppTheme.matisse,
                 fontWeight: FontWeight.bold,
               ),
             ),

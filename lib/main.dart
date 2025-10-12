@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:vision_website/screens/app/splash_screen.dart';
-import 'package:vision_website/screens/app/theme_provider.dart';
+import 'package:vision_website/screens/app/providers/theme_provider.dart';
 
 void main() {
   runApp(const MyApp());

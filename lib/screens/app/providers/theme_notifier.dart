@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vision_website/screens/app/theme_provider.dart';
+import 'package:vision_website/screens/app/providers/theme_provider.dart';
 
 class ThemeNotifier with ChangeNotifier {
   ThemeData _currentTheme = AppTheme.lightTheme;

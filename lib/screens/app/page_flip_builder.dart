@@ -10,11 +10,11 @@ class PageFlipBuilder extends StatefulWidget {
   final Duration duration;
 
   const PageFlipBuilder({
-    Key? key,
+    super.key,
     required this.frontBuilder,
     required this.backBuilder,
     this.duration = const Duration(milliseconds: 600),
-  }) : super(key: key);
+  });
 
   @override
   _PageFlipBuilderState createState() => _PageFlipBuilderState();

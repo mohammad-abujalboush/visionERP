@@ -1,71 +1,91 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  // Custom colors
-  static const Color oxfordBlue = Color(0xFF002147);
-  static const Color white = Color(0xFFFFFFFF);
-  static const Color buttonColor = Color(0xFF05465f);
-  static const Color iconColor = Color(0xFF8fb9c8);
-  static const Color rememberMeColor = Colors.orange;
+  // New custom colors based on your palette
+  static const Color diSerria = Color(0xFFdb9b4e);
+  static const Color matisse = Color(0xFF196390);
+  static const Color athensGray = Color(0xFFf1f1f2);
+  static const Color jumbo = Color(0xFF79787a);
+  static const Color mako = Color(0xFF40494f);
+  static const Color hippieBlue = Color(0xFF6697b6);
+  static const Color silverSand = Color(0xFFbfc2c6);
+  static const Color dairyCream = Color(0xFFf9dab5);
   
-  // Gradient colors
+  // Aliases for semantic usage (mapping old names to new colors)
+  static const Color oxfordBlue = matisse;        // Primary blue
+  static const Color white = athensGray;          // Background white
+  static const Color buttonColor = diSerria;      // Primary button color
+  static const Color iconColor = hippieBlue;      // Icon color
+  static const Color rememberMeColor = diSerria;  // Checkbox color
+  
+  // Gradient colors using new palette
   static const List<Color> gradientColors = [
-    Color(0xFFf5ba6e),
-    Color(0xFFfcbc50),
-    Color(0xFFf4a749),
-    Color(0xFFd38430),
+    diSerria,
+    Color(0xFFe8b06e), // Lighter shade of diSerria
+    Color(0xFFd18a3a), // Darker shade of diSerria
+    Color(0xFFc47a2a), // Even darker shade
   ];
 
   static ThemeData get lightTheme {
     return ThemeData(
       // Primary color scheme
-      primaryColor: oxfordBlue,
-      primaryColorDark: buttonColor,
-      primaryColorLight: iconColor,
+      primaryColor: matisse,
+      primaryColorDark: mako,
+      primaryColorLight: hippieBlue,
       
       // Font family
       fontFamily: 'Cairo',
       
       // Color scheme
       colorScheme: const ColorScheme.light(
-        primary: oxfordBlue,
-        secondary: buttonColor,
-        surface: white,
+        primary: matisse,
+        secondary: diSerria,
+        surface: athensGray,
+        background: athensGray,
       ),
+      
+      // Scaffold background color
+      scaffoldBackgroundColor: athensGray,
       
       // App bar theme
       appBarTheme: const AppBarTheme(
-        backgroundColor: oxfordBlue,
-        foregroundColor: white,
+        backgroundColor: matisse,
+        foregroundColor: athensGray,
         elevation: 0,
         centerTitle: true,
-        iconTheme: IconThemeData(color: white),
+        iconTheme: IconThemeData(color: athensGray),
         titleTextStyle: TextStyle(
           fontFamily: 'Cairo',
           fontSize: 20,
           fontWeight: FontWeight.w600,
-          color: white,
+          color: athensGray,
         ),
       ),
       
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: athensGray,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: oxfordBlue),
+          borderSide: const BorderSide(color: silverSand),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: silverSand),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: oxfordBlue, width: 2),
+          borderSide: const BorderSide(color: matisse, width: 2),
         ),
         labelStyle: const TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontWeight: FontWeight.w400,
         ),
         floatingLabelStyle: const TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: matisse,
           fontWeight: FontWeight.w500,
         ),
       ),
@@ -74,73 +94,73 @@ class AppTheme {
       textTheme: const TextTheme(
         displayLarge: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontSize: 28,
           fontWeight: FontWeight.w700,
         ),
         displayMedium: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontSize: 24,
           fontWeight: FontWeight.w600,
         ),
         displaySmall: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
         headlineMedium: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontSize: 18,
           fontWeight: FontWeight.w500,
         ),
         headlineSmall: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontSize: 16,
           fontWeight: FontWeight.w500,
         ),
         titleLarge: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontSize: 22,
           fontWeight: FontWeight.w500,
         ),
         bodyLarge: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontSize: 16,
           fontWeight: FontWeight.w400,
         ),
         bodyMedium: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: jumbo,
           fontSize: 14,
           fontWeight: FontWeight.w400,
         ),
         bodySmall: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: jumbo,
           fontSize: 12,
           fontWeight: FontWeight.w300,
         ),
         labelLarge: TextStyle(
           fontFamily: 'Cairo',
-          color: white,
+          color: athensGray,
           fontSize: 16,
           fontWeight: FontWeight.w600,
         ),
         labelMedium: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: mako,
           fontSize: 14,
           fontWeight: FontWeight.w500,
         ),
         labelSmall: TextStyle(
           fontFamily: 'Cairo',
-          color: oxfordBlue,
+          color: jumbo,
           fontSize: 12,
           fontWeight: FontWeight.w400,
         ),
@@ -149,8 +169,8 @@ class AppTheme {
       // Button themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: buttonColor,
-          foregroundColor: white,
+          backgroundColor: diSerria,
+          foregroundColor: athensGray,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
           ),
@@ -167,7 +187,7 @@ class AppTheme {
       // Text button theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: oxfordBlue,
+          foregroundColor: matisse,
           textStyle: const TextStyle(
             fontFamily: 'Cairo',
             fontWeight: FontWeight.w500,
@@ -179,11 +199,11 @@ class AppTheme {
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith<Color>((states) {
           if (states.contains(WidgetState.selected)) {
-            return rememberMeColor;
+            return diSerria;
           }
-          return oxfordBlue.withOpacity(0.5);
+          return silverSand;
         }),
-        checkColor: WidgetStateProperty.all(white),
+        checkColor: WidgetStateProperty.all(athensGray),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(4),
         ),
@@ -191,7 +211,7 @@ class AppTheme {
 
       // Divider theme
       dividerTheme: DividerThemeData(
-        color: oxfordBlue.withOpacity(0.3),
+        color: silverSand,
         thickness: 1,
         space: 20,
       ),
@@ -200,7 +220,7 @@ class AppTheme {
     );
   }
   
-  // Custom gradient for backgrounds
+  // Custom gradient for backgrounds (kept for splash and intro screens)
   static BoxDecoration get gradientBackground {
     return const BoxDecoration(
       gradient: LinearGradient(
@@ -215,7 +235,7 @@ class AppTheme {
   static TextStyle cairoTextStyle({
     double fontSize = 16,
     FontWeight fontWeight = FontWeight.w400,
-    Color color = oxfordBlue,
+    Color color = mako,
     double? height,
     TextDecoration? decoration,
   }) {
@@ -230,31 +250,31 @@ class AppTheme {
   }
 
   // Convenience methods for common font weights
-  static TextStyle cairoLight({double fontSize = 16, Color color = oxfordBlue, double? height}) {
+  static TextStyle cairoLight({double fontSize = 16, Color color = mako, double? height}) {
     return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w300, color: color, height: height);
   }
 
-  static TextStyle cairoRegular({double fontSize = 16, Color color = oxfordBlue, double? height}) {
+  static TextStyle cairoRegular({double fontSize = 16, Color color = mako, double? height}) {
     return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w400, color: color, height: height);
   }
 
-  static TextStyle cairoMedium({double fontSize = 16, Color color = oxfordBlue, double? height}) {
+  static TextStyle cairoMedium({double fontSize = 16, Color color = mako, double? height}) {
     return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w500, color: color, height: height);
   }
 
-  static TextStyle cairoSemiBold({double fontSize = 16, Color color = oxfordBlue, double? height}) {
+  static TextStyle cairoSemiBold({double fontSize = 16, Color color = mako, double? height}) {
     return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: color, height: height);
   }
 
-  static TextStyle cairoBold({double fontSize = 16, Color color = oxfordBlue, double? height}) {
+  static TextStyle cairoBold({double fontSize = 16, Color color = mako, double? height}) {
     return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w700, color: color, height: height);
   }
 
-  static TextStyle cairoExtraBold({double fontSize = 16, Color color = oxfordBlue, double? height}) {
+  static TextStyle cairoExtraBold({double fontSize = 16, Color color = mako, double? height}) {
     return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w800, color: color, height: height);
   }
 
-  static TextStyle cairoBlack({double fontSize = 16, Color color = oxfordBlue, double? height}) {
+  static TextStyle cairoBlack({double fontSize = 16, Color color = mako, double? height}) {
     return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, color: color, height: height);
   }
 }
