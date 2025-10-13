@@ -21,15 +21,19 @@ class SidebarProvider {
         icon: Icons.dashboard,
       ),
       
-      // Notifications - New second item
       SidebarItem(
         title: 'Notifications',
         icon: Icons.notifications,
       ),
       
-      // Separator line (we'll handle this in the UI)
-      
-      // Existing menu items
+      SidebarItem(
+        title: 'المؤسسة',
+        icon: Icons.business,
+        children: [
+          SidebarItem(title: 'المعلومات العامة', icon: Icons.work),
+        ],
+      ),
+
       SidebarItem(
         title: 'الإعدادات العامة',
         icon: Icons.settings,

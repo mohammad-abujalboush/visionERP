@@ -41,7 +41,6 @@ class AppTheme {
         primary: matisse,
         secondary: diSerria,
         surface: athensGray,
-        background: athensGray,
       ),
       
       // Scaffold background color
