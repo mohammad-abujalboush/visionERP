@@ -18,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       backgroundColor: AppTheme.athensGray, // Changed background to athensGray
       body: SafeArea(
@@ -70,14 +70,18 @@ class _LoginPageState extends State<LoginPage> {
             fontSize: 28,
             fontWeight: FontWeight.bold,
           ),
+          textDirection: TextDirection.ltr, // Keep "Login" in LTR
         ),
         const SizedBox(height: 10),
         Text(
           'Login into your account',
           style: TextStyle(
-            color: AppTheme.matisse.withOpacity(0.7), // Changed to matisse color
+            color: AppTheme.matisse.withOpacity(
+              0.7,
+            ), // Changed to matisse color
             fontFamily: 'Cairo',
           ),
+          textDirection: TextDirection.ltr, // Keep description in LTR
         ),
       ],
     );
@@ -108,7 +112,10 @@ class _LoginPageState extends State<LoginPage> {
                 labelStyle: theme.textTheme.bodyLarge?.copyWith(
                   color: AppTheme.mako, // Dark text color
                 ),
-                prefixIcon: Icon(Icons.person, color: AppTheme.matisse), // matisse icon
+                prefixIcon: Icon(
+                  Icons.person,
+                  color: AppTheme.matisse,
+                ), // matisse icon
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppTheme.silverSand),
@@ -119,7 +126,10 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: AppTheme.matisse, width: 2), // matisse border
+                  borderSide: BorderSide(
+                    color: AppTheme.matisse,
+                    width: 2,
+                  ), // matisse border
                 ),
                 filled: true,
                 fillColor: AppTheme.athensGray,
@@ -132,9 +142,9 @@ class _LoginPageState extends State<LoginPage> {
                 return null;
               },
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Password Field
             TextFormField(
               controller: _passwordController,
@@ -143,7 +153,10 @@ class _LoginPageState extends State<LoginPage> {
                 labelStyle: theme.textTheme.bodyLarge?.copyWith(
                   color: AppTheme.mako, // Dark text color
                 ),
-                prefixIcon: Icon(Icons.lock, color: AppTheme.matisse), // matisse icon
+                prefixIcon: Icon(
+                  Icons.lock,
+                  color: AppTheme.matisse,
+                ), // matisse icon
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide(color: AppTheme.silverSand),
@@ -154,7 +167,10 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: AppTheme.matisse, width: 2), // matisse border
+                  borderSide: BorderSide(
+                    color: AppTheme.matisse,
+                    width: 2,
+                  ), // matisse border
                 ),
                 filled: true,
                 fillColor: AppTheme.athensGray,
@@ -170,9 +186,9 @@ class _LoginPageState extends State<LoginPage> {
                 return null;
               },
             ),
-            
+
             const SizedBox(height: 15),
-            
+
             // Remember me & Forgot Password
             Row(
               children: [
@@ -214,9 +230,9 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 25),
-            
+
             // Login Button
             SizedBox(
               width: double.infinity,
@@ -285,7 +301,8 @@ class _LoginPageState extends State<LoginPage> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (context) => const HomePage(title: 'Vision ERP Dashboard'),
+              builder: (context) =>
+                  const HomePage(title: 'Vision ERP Dashboard'),
             ),
           );
         }
@@ -299,15 +316,15 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => AlertDialog(
         title: Text(
           'Forgot Password',
-          style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            color: AppTheme.mako,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.displayMedium?.copyWith(color: AppTheme.mako),
         ),
         content: Text(
           'This will be a link to reset your password.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppTheme.jumbo,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppTheme.jumbo),
         ),
         actions: [
           TextButton(
@@ -331,15 +348,15 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) => AlertDialog(
         title: Text(
           'Registration',
-          style: Theme.of(context).textTheme.displayMedium?.copyWith(
-            color: AppTheme.mako,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.displayMedium?.copyWith(color: AppTheme.mako),
         ),
         content: Text(
           'Please fill in the required fields to register a new account.',
-          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-            color: AppTheme.jumbo,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppTheme.jumbo),
         ),
         actions: [
           TextButton(

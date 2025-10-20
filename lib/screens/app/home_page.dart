@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:vision_website/foundation/localization/locale_provider.dart';
 import 'package:vision_website/screens/app/login_page.dart';
 import 'package:vision_website/screens/app/organization.dart';
 import 'package:vision_website/screens/app/providers/sidebar_provider.dart';
@@ -14,21 +16,22 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   String _currentPage = 'dashboard';
-  
+
   late AnimationController _sidebarAnimationController;
   late Animation<double> _sidebarWidthAnimation;
   late Animation<double> _sidebarOpacityAnimation;
-  
+
   bool _isSidebarVisible = true;
   bool _isOrganizationExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    
+
     _sidebarAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -38,26 +41,25 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    
+
     final screenWidth = MediaQuery.of(context).size.width;
     final targetWidth = _isSmallScreen(context) ? 220.0 : 280.0;
-    
-    _sidebarWidthAnimation = Tween<double>(
-      begin: 0.0,
-      end: targetWidth,
-    ).animate(CurvedAnimation(
-      parent: _sidebarAnimationController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _sidebarOpacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _sidebarAnimationController,
-      curve: Curves.easeInOut,
-    ));
-    
+
+    _sidebarWidthAnimation = Tween<double>(begin: 0.0, end: targetWidth)
+        .animate(
+          CurvedAnimation(
+            parent: _sidebarAnimationController,
+            curve: Curves.easeInOut,
+          ),
+        );
+
+    _sidebarOpacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _sidebarAnimationController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
     _sidebarAnimationController.forward();
   }
 
@@ -67,8 +69,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     super.dispose();
   }
 
-  bool _isSmallScreen(BuildContext context) => MediaQuery.of(context).size.width < 768;
-  bool _isVerySmallScreen(BuildContext context) => MediaQuery.of(context).size.width < 480;
+  bool _isSmallScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width < 768;
+  bool _isVerySmallScreen(BuildContext context) =>
+      MediaQuery.of(context).size.width < 480;
 
   void _toggleSidebar() {
     if (_isSidebarVisible) {
@@ -99,19 +103,18 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       backgroundColor: AppTheme.white,
       body: Row(
         children: [
-          if (!_isVerySmallScreen(context)) 
+          if (!_isVerySmallScreen(context))
             ConstrainedBox(
               constraints: BoxConstraints(
                 maxWidth: _isSmallScreen(context) ? 220.0 : 280.0,
               ),
               child: _buildAnimatedSidebar(context),
             ),
-          Expanded(
-            child: _buildMainContent(context),
-          ),
+          Expanded(child: _buildMainContent(context)),
         ],
       ),
-      floatingActionButton: _isSmallScreen(context) && !_isVerySmallScreen(context) 
+      floatingActionButton:
+          _isSmallScreen(context) && !_isVerySmallScreen(context)
           ? FloatingActionButton(
               mini: true,
               backgroundColor: AppTheme.matisse,
@@ -144,7 +147,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           child: Opacity(
             opacity: _sidebarOpacityAnimation.value,
-            child: _isSidebarVisible ? _buildSidebarContent(context) : const SizedBox(),
+            child: _isSidebarVisible
+                ? _buildSidebarContent(context)
+                : const SizedBox(),
           ),
         );
       },
@@ -189,6 +194,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                     fontSize: _isSmallScreen(context) ? 16 : 18,
                     fontWeight: FontWeight.bold,
                   ),
+                  textDirection: TextDirection.ltr, // Keep "Vision ERP" in LTR
                 ),
               ),
               if (_isSmallScreen(context))
@@ -203,7 +209,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ],
           ),
         ),
-        
+
         Expanded(
           child: SingleChildScrollView(
             child: Column(
@@ -226,10 +232,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         }
                       },
                     ),
-                    
+
                     _buildSidebarItem(
                       context,
-                      SidebarItem(title: 'Notifications', icon: Icons.notifications),
+                      SidebarItem(
+                        title: 'Notifications',
+                        icon: Icons.notifications,
+                      ),
                       0,
                       isSelected: _currentPage == 'notifications',
                       onTap: () {
@@ -242,26 +251,30 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                         }
                       },
                     ),
-                    
+
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 8),
                       height: 1,
                       color: AppTheme.athensGray.withOpacity(0.3),
                     ),
-                    
+
                     // المؤسسة section as dropdown
                     _buildOrganizationDropdown(context),
-                    
-                    ..._buildSidebarItems(SidebarProvider.getSidebarItems().sublist(3)),
+
+                    ..._buildSidebarItems(
+                      SidebarProvider.getSidebarItems().sublist(3),
+                    ),
                   ],
                 ),
-                
+
                 // Bottom section
                 Container(
                   padding: EdgeInsets.all(_isSmallScreen(context) ? 8 : 12),
                   decoration: BoxDecoration(
                     border: Border(
-                      top: BorderSide(color: AppTheme.athensGray.withOpacity(0.3)),
+                      top: BorderSide(
+                        color: AppTheme.athensGray.withOpacity(0.3),
+                      ),
                     ),
                   ),
                   child: Column(
@@ -278,7 +291,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                           }
                         },
                       ),
-                      
+
                       _buildSidebarItem(
                         context,
                         SidebarItem(title: 'Logout', icon: Icons.logout),
@@ -308,8 +321,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         Container(
           margin: EdgeInsets.only(left: 0),
           decoration: BoxDecoration(
-            color: (_currentPage == 'organization' || _currentPage == 'general_info') 
-                ? AppTheme.matisse.withOpacity(0.3) 
+            color:
+                (_currentPage == 'organization' ||
+                    _currentPage == 'general_info')
+                ? AppTheme.matisse.withOpacity(0.3)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -321,21 +336,27 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               child: ListTile(
                 leading: Icon(
                   Icons.business,
-                  color: (_currentPage == 'organization' || _currentPage == 'general_info') 
-                      ? AppTheme.athensGray 
+                  color:
+                      (_currentPage == 'organization' ||
+                          _currentPage == 'general_info')
+                      ? AppTheme.athensGray
                       : AppTheme.athensGray.withOpacity(0.7),
                   size: _isSmallScreen(context) ? 18 : 20,
                 ),
                 title: Text(
                   'المؤسسة',
                   style: TextStyle(
-                    color: (_currentPage == 'organization' || _currentPage == 'general_info') 
-                        ? AppTheme.athensGray 
+                    color:
+                        (_currentPage == 'organization' ||
+                            _currentPage == 'general_info')
+                        ? AppTheme.athensGray
                         : AppTheme.athensGray.withOpacity(0.8),
                     fontFamily: 'Cairo',
                     fontSize: _isSmallScreen(context) ? 13 : 14,
-                    fontWeight: (_currentPage == 'organization' || _currentPage == 'general_info') 
-                        ? FontWeight.bold 
+                    fontWeight:
+                        (_currentPage == 'organization' ||
+                            _currentPage == 'general_info')
+                        ? FontWeight.bold
                         : FontWeight.normal,
                   ),
                 ),
@@ -345,14 +366,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                       ? const Icon(Icons.expand_less, key: ValueKey('up'))
                       : const Icon(Icons.expand_more, key: ValueKey('down')),
                 ),
-                contentPadding: EdgeInsets.symmetric(horizontal: _isSmallScreen(context) ? 8 : 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: _isSmallScreen(context) ? 8 : 12,
+                ),
                 minLeadingWidth: 0,
                 dense: _isSmallScreen(context),
               ),
             ),
           ),
         ),
-        
+
         if (_isOrganizationExpanded)
           AnimatedContainer(
             duration: const Duration(milliseconds: 300),
@@ -381,30 +404,46 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildSidebarItem(BuildContext context, SidebarItem item, int level, {bool isSelected = false, required VoidCallback onTap}) {
+  Widget _buildSidebarItem(
+    BuildContext context,
+    SidebarItem item,
+    int level, {
+    bool isSelected = false,
+    required VoidCallback onTap,
+  }) {
     return Container(
-      margin: EdgeInsets.only(left: level * (_isSmallScreen(context) ? 12.0 : 16.0)),
+      margin: EdgeInsets.only(
+        left: level * (_isSmallScreen(context) ? 12.0 : 16.0),
+      ),
       decoration: BoxDecoration(
-        color: isSelected ? AppTheme.matisse.withOpacity(0.3) : Colors.transparent,
+        color: isSelected
+            ? AppTheme.matisse.withOpacity(0.3)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(
         leading: Icon(
           item.icon,
-          color: isSelected ? AppTheme.athensGray : AppTheme.athensGray.withOpacity(0.7),
+          color: isSelected
+              ? AppTheme.athensGray
+              : AppTheme.athensGray.withOpacity(0.7),
           size: _isSmallScreen(context) ? 18 : 20,
         ),
         title: Text(
           item.title,
           style: TextStyle(
-            color: isSelected ? AppTheme.athensGray : AppTheme.athensGray.withOpacity(0.8),
+            color: isSelected
+                ? AppTheme.athensGray
+                : AppTheme.athensGray.withOpacity(0.8),
             fontFamily: 'Cairo',
             fontSize: _isSmallScreen(context) ? 13 : 14,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
         onTap: onTap,
-        contentPadding: EdgeInsets.symmetric(horizontal: _isSmallScreen(context) ? 8 : 12),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: _isSmallScreen(context) ? 8 : 12,
+        ),
         minLeadingWidth: 0,
         dense: _isSmallScreen(context),
       ),
@@ -442,7 +481,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         // App Bar
         Container(
           height: _isVerySmallScreen(context) ? 60 : 80,
-          padding: EdgeInsets.symmetric(horizontal: _isVerySmallScreen(context) ? 16 : 24),
+          padding: EdgeInsets.symmetric(
+            horizontal: _isVerySmallScreen(context) ? 16 : 24,
+          ),
           decoration: BoxDecoration(
             color: AppTheme.white,
             boxShadow: [
@@ -456,26 +497,36 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (!_isVerySmallScreen(context))
-                IconButton(
-                  icon: AnimatedIcon(
-                    icon: AnimatedIcons.menu_close,
-                    progress: _sidebarAnimationController,
-                    size: _isSmallScreen(context) ? 20 : 24,
-                    color: AppTheme.matisse,
-                  ),
-                  onPressed: _toggleSidebar,
-                ),
-              
-              Expanded(
-                child: Text(
-                  _getPageTitle(),
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                        fontFamily: 'Cairo',
-                        fontSize: _isVerySmallScreen(context) ? 18 : 20,
+              Row(
+                children: [
+                  if (!_isVerySmallScreen(context))
+                    IconButton(
+                      icon: AnimatedIcon(
+                        icon: AnimatedIcons.menu_close,
+                        progress: _sidebarAnimationController,
+                        size: _isSmallScreen(context) ? 20 : 24,
+                        color: AppTheme.matisse,
                       ),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                      onPressed: _toggleSidebar,
+                    ),
+
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: _isVerySmallScreen(context) ? 8 : 16,
+                      ),
+                      child: Text(
+                        _getPageTitle(),
+                        style: Theme.of(context).textTheme.displayMedium
+                            ?.copyWith(
+                              fontFamily: 'Cairo',
+                              fontSize: _isVerySmallScreen(context) ? 18 : 20,
+                            ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               Row(
                 children: [
@@ -498,7 +549,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ],
           ),
         ),
-        
+
         Expanded(
           child: Container(
             padding: EdgeInsets.all(_isVerySmallScreen(context) ? 16 : 24),
@@ -511,11 +562,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _buildProfileMenu(BuildContext context) {
+    final localeProvider = Provider.of<LocaleProvider>(context, listen: false);
+
     return PopupMenuButton<String>(
       offset: const Offset(0, 50),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       itemBuilder: (BuildContext context) => [
         PopupMenuItem<String>(
           value: 'profile',
@@ -525,10 +576,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               const SizedBox(width: 8),
               const Text(
                 'Profile',
-                style: TextStyle(
-                  fontFamily: 'Cairo',
-                  fontSize: 14,
-                ),
+                style: TextStyle(fontFamily: 'Cairo', fontSize: 14),
+                textDirection: TextDirection.ltr, // Keep "Profile" in LTR
               ),
             ],
           ),
@@ -546,6 +595,24 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                   fontSize: 14,
                   color: Colors.red,
                 ),
+                textDirection: TextDirection.ltr, // Keep "Logout" in LTR
+              ),
+            ],
+          ),
+        ),
+        PopupMenuItem<String>(
+          value: 'toggle_locale',
+          child: Row(
+            children: [
+              Icon(Icons.language, color: AppTheme.matisse, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                localeProvider.isRTL
+                    ? 'Switch to English'
+                    : 'التبديل إلى العربية',
+                style: TextStyle(fontFamily: 'Cairo', fontSize: 14),
+                textDirection:
+                    TextDirection.ltr, // Keep locale switch text in LTR
               ),
             ],
           ),
@@ -556,6 +623,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           _navigateToProfile();
         } else if (value == 'logout') {
           _navigateToLogin();
+        } else if (value == 'toggle_locale') {
+          localeProvider.toggleLocale();
         }
       },
       child: Container(
@@ -630,6 +699,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       child: Text(
         'Notifications Page',
         style: TextStyle(fontSize: 24, fontFamily: 'Cairo'),
+        textDirection: TextDirection.ltr, // Keep "Notifications Page" in LTR
       ),
     );
   }
@@ -680,7 +750,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
           LayoutBuilder(
             builder: (context, constraints) {
-              final crossAxisCount = _isVerySmallScreen(context) ? 2 : (_isSmallScreen(context) ? 3 : 4);
+              final crossAxisCount = _isVerySmallScreen(context)
+                  ? 2
+                  : (_isSmallScreen(context) ? 3 : 4);
               return GridView.count(
                 crossAxisCount: crossAxisCount,
                 shrinkWrap: true,
@@ -689,10 +761,34 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 mainAxisSpacing: _isVerySmallScreen(context) ? 12 : 16,
                 childAspectRatio: _isVerySmallScreen(context) ? 1.2 : 1.1,
                 children: [
-                  _buildStatCard(context, 'إجمالي المبيعات', '١٢٥,٠٠٠ ر.س', Icons.shopping_cart, AppTheme.diSerria),
-                  _buildStatCard(context, 'إجمالي العملاء', '٤٨٥', Icons.people, AppTheme.matisse),
-                  _buildStatCard(context, 'الطلبات الجديدة', '٣٤', Icons.inventory, AppTheme.hippieBlue),
-                  _buildStatCard(context, 'الموردين', '٨٩', Icons.handshake, Colors.purple),
+                  _buildStatCard(
+                    context,
+                    'إجمالي المبيعات',
+                    '١٢٥,٠٠٠ ر.س',
+                    Icons.shopping_cart,
+                    AppTheme.diSerria,
+                  ),
+                  _buildStatCard(
+                    context,
+                    'إجمالي العملاء',
+                    '٤٨٥',
+                    Icons.people,
+                    AppTheme.matisse,
+                  ),
+                  _buildStatCard(
+                    context,
+                    'الطلبات الجديدة',
+                    '٣٤',
+                    Icons.inventory,
+                    AppTheme.hippieBlue,
+                  ),
+                  _buildStatCard(
+                    context,
+                    'الموردين',
+                    '٨٩',
+                    Icons.handshake,
+                    Colors.purple,
+                  ),
                 ],
               );
             },
@@ -706,7 +802,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildStatCard(BuildContext context, String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    BuildContext context,
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: EdgeInsets.all(_isVerySmallScreen(context) ? 12 : 16),
       decoration: BoxDecoration(
@@ -739,19 +841,19 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           Text(
             value,
             style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                  fontFamily: 'Cairo',
-                  fontWeight: FontWeight.bold,
-                  fontSize: _isVerySmallScreen(context) ? 16 : 18,
-                ),
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.bold,
+              fontSize: _isVerySmallScreen(context) ? 16 : 18,
+            ),
           ),
           SizedBox(height: _isVerySmallScreen(context) ? 2 : 4),
           Text(
             title,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontFamily: 'Cairo',
-                  color: Colors.grey[600],
-                  fontSize: _isVerySmallScreen(context) ? 12 : 14,
-                ),
+              fontFamily: 'Cairo',
+              color: Colors.grey[600],
+              fontSize: _isVerySmallScreen(context) ? 12 : 14,
+            ),
           ),
         ],
       ),
@@ -765,9 +867,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         Text(
           'التقارير والإحصائيات',
           style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                fontFamily: 'Cairo',
-                fontSize: _isVerySmallScreen(context) ? 18 : 20,
-              ),
+            fontFamily: 'Cairo',
+            fontSize: _isVerySmallScreen(context) ? 18 : 20,
+          ),
         ),
         SizedBox(height: _isVerySmallScreen(context) ? 12 : 16),
         if (_isVerySmallScreen(context)) ..._buildVerticalCharts(context),
@@ -792,17 +894,37 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return [
       Row(
         children: [
-          Expanded(child: _buildChartContainer(context, 'مبيعات الشهر', AppTheme.diSerria)),
+          Expanded(
+            child: _buildChartContainer(
+              context,
+              'مبيعات الشهر',
+              AppTheme.diSerria,
+            ),
+          ),
           SizedBox(width: _isSmallScreen(context) ? 12 : 16),
-          Expanded(child: _buildChartContainer(context, 'توزيع العملاء', AppTheme.matisse)),
+          Expanded(
+            child: _buildChartContainer(
+              context,
+              'توزيع العملاء',
+              AppTheme.matisse,
+            ),
+          ),
         ],
       ),
       SizedBox(height: _isSmallScreen(context) ? 12 : 16),
       Row(
         children: [
-          Expanded(child: _buildChartContainer(context, 'المشتريات', AppTheme.hippieBlue)),
+          Expanded(
+            child: _buildChartContainer(
+              context,
+              'المشتريات',
+              AppTheme.hippieBlue,
+            ),
+          ),
           SizedBox(width: _isSmallScreen(context) ? 12 : 16),
-          Expanded(child: _buildChartContainer(context, 'المخزون', Colors.purple)),
+          Expanded(
+            child: _buildChartContainer(context, 'المخزون', Colors.purple),
+          ),
         ],
       ),
     ];
@@ -829,10 +951,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           Text(
             title,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontFamily: 'Cairo',
-                  fontWeight: FontWeight.bold,
-                  fontSize: _isVerySmallScreen(context) ? 14 : 16,
-                ),
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.bold,
+              fontSize: _isVerySmallScreen(context) ? 14 : 16,
+            ),
           ),
           SizedBox(height: _isVerySmallScreen(context) ? 12 : 16),
           Expanded(
@@ -875,44 +997,37 @@ class _AnimatedSidebarItemWidget extends StatefulWidget {
   });
 
   @override
-  State<_AnimatedSidebarItemWidget> createState() => __AnimatedSidebarItemWidgetState();
+  State<_AnimatedSidebarItemWidget> createState() =>
+      __AnimatedSidebarItemWidgetState();
 }
 
-class __AnimatedSidebarItemWidgetState extends State<_AnimatedSidebarItemWidget> 
+class __AnimatedSidebarItemWidgetState extends State<_AnimatedSidebarItemWidget>
     with SingleTickerProviderStateMixin {
   late AnimationController _expandController;
   late Animation<double> _heightAnimation;
   late Animation<double> _opacityAnimation;
-  
+
   bool _isExpanded = false;
   late List<double> _childOpacities;
 
   @override
   void initState() {
     super.initState();
-    
+
     _childOpacities = widget.item.children?.map((_) => 0.0).toList() ?? [];
-    
+
     _expandController = AnimationController(
       duration: const Duration(milliseconds: 400),
       vsync: this,
     );
-    
-    _heightAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _expandController,
-      curve: Curves.easeInOut,
-    ));
-    
-    _opacityAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _expandController,
-      curve: Curves.easeInOut,
-    ));
+
+    _heightAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _expandController, curve: Curves.easeInOut),
+    );
+
+    _opacityAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _expandController, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -953,7 +1068,7 @@ class __AnimatedSidebarItemWidgetState extends State<_AnimatedSidebarItemWidget>
 
     for (int i = widget.item.children!.length - 1; i >= 0; i--) {
       final delay = (widget.item.children!.length - 1 - i) * 150;
-      
+
       Future.delayed(Duration(milliseconds: delay), () {
         if (mounted && i < _childOpacities.length) {
           setState(() {
@@ -968,7 +1083,7 @@ class __AnimatedSidebarItemWidgetState extends State<_AnimatedSidebarItemWidget>
     if (index >= _childOpacities.length) {
       return const SizedBox.shrink();
     }
-    
+
     return AnimatedOpacity(
       duration: const Duration(milliseconds: 250),
       opacity: _childOpacities[index],
@@ -989,9 +1104,13 @@ class __AnimatedSidebarItemWidgetState extends State<_AnimatedSidebarItemWidget>
       children: [
         // Parent item
         Container(
-          margin: EdgeInsets.only(left: widget.level * (isSmallScreen ? 12.0 : 16.0)),
+          margin: EdgeInsets.only(
+            left: widget.level * (isSmallScreen ? 12.0 : 16.0),
+          ),
           decoration: BoxDecoration(
-            color: widget.isSelected ? AppTheme.matisse.withOpacity(0.3) : Colors.transparent,
+            color: widget.isSelected
+                ? AppTheme.matisse.withOpacity(0.3)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Material(
@@ -1008,16 +1127,22 @@ class __AnimatedSidebarItemWidgetState extends State<_AnimatedSidebarItemWidget>
               child: ListTile(
                 leading: Icon(
                   widget.item.icon,
-                  color: widget.isSelected ? AppTheme.athensGray : AppTheme.athensGray.withOpacity(0.7),
+                  color: widget.isSelected
+                      ? AppTheme.athensGray
+                      : AppTheme.athensGray.withOpacity(0.7),
                   size: isSmallScreen ? 18 : 20,
                 ),
                 title: Text(
                   widget.item.title,
                   style: TextStyle(
-                    color: widget.isSelected ? AppTheme.athensGray : AppTheme.athensGray.withOpacity(0.8),
+                    color: widget.isSelected
+                        ? AppTheme.athensGray
+                        : AppTheme.athensGray.withOpacity(0.8),
                     fontFamily: 'Cairo',
                     fontSize: isSmallScreen ? 13 : 14,
-                    fontWeight: widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                    fontWeight: widget.isSelected
+                        ? FontWeight.bold
+                        : FontWeight.normal,
                   ),
                 ),
                 trailing: widget.item.children != null
@@ -1025,17 +1150,22 @@ class __AnimatedSidebarItemWidgetState extends State<_AnimatedSidebarItemWidget>
                         duration: const Duration(milliseconds: 200),
                         child: _isExpanded
                             ? const Icon(Icons.expand_less, key: ValueKey('up'))
-                            : const Icon(Icons.expand_more, key: ValueKey('down')),
+                            : const Icon(
+                                Icons.expand_more,
+                                key: ValueKey('down'),
+                              ),
                       )
                     : null,
-                contentPadding: EdgeInsets.symmetric(horizontal: isSmallScreen ? 8 : 12),
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: isSmallScreen ? 8 : 12,
+                ),
                 minLeadingWidth: 0,
                 dense: isSmallScreen,
               ),
             ),
           ),
         ),
-        
+
         if (widget.item.children != null && _childOpacities.isNotEmpty)
           AnimatedBuilder(
             animation: _expandController,
