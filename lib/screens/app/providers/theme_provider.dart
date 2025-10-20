@@ -2,22 +2,22 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // New custom colors based on your palette
-  static const Color diSerria = Color(0xFFdb9b4e);
-  static const Color matisse = Color(0xFF196390);
+  static const Color diSerria = Color(0xFFFFC000);
+  static const Color matisse = Color(0xFF153466);
   static const Color athensGray = Color(0xFFf1f1f2);
   static const Color jumbo = Color(0xFF79787a);
   static const Color mako = Color(0xFF40494f);
   static const Color hippieBlue = Color(0xFF6697b6);
   static const Color silverSand = Color(0xFFbfc2c6);
   static const Color dairyCream = Color(0xFFf9dab5);
-  
+
   // Aliases for semantic usage (mapping old names to new colors)
-  static const Color oxfordBlue = matisse;        // Primary blue
-  static const Color white = athensGray;          // Background white
-  static const Color buttonColor = diSerria;      // Primary button color
-  static const Color iconColor = hippieBlue;      // Icon color
-  static const Color rememberMeColor = diSerria;  // Checkbox color
-  
+  static const Color oxfordBlue = matisse; // Primary blue
+  static const Color white = athensGray; // Background white
+  static const Color buttonColor = diSerria; // Primary button color
+  static const Color iconColor = hippieBlue; // Icon color
+  static const Color rememberMeColor = diSerria; // Checkbox color
+
   // Gradient colors using new palette
   static const List<Color> gradientColors = [
     diSerria,
@@ -32,20 +32,20 @@ class AppTheme {
       primaryColor: matisse,
       primaryColorDark: mako,
       primaryColorLight: hippieBlue,
-      
+
       // Font family
       fontFamily: 'Cairo',
-      
+
       // Color scheme
       colorScheme: const ColorScheme.light(
         primary: matisse,
         secondary: diSerria,
         surface: athensGray,
       ),
-      
+
       // Scaffold background color
       scaffoldBackgroundColor: athensGray,
-      
+
       // App bar theme
       appBarTheme: const AppBarTheme(
         backgroundColor: matisse,
@@ -60,7 +60,7 @@ class AppTheme {
           color: athensGray,
         ),
       ),
-      
+
       // Input decoration theme
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
@@ -88,7 +88,7 @@ class AppTheme {
           fontWeight: FontWeight.w500,
         ),
       ),
-      
+
       // Text theme with Cairo font and all weights
       textTheme: const TextTheme(
         displayLarge: TextStyle(
@@ -164,15 +164,13 @@ class AppTheme {
           fontWeight: FontWeight.w400,
         ),
       ),
-      
+
       // Button themes
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: diSerria,
           foregroundColor: athensGray,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 2,
           minimumSize: const Size(double.infinity, 50),
           textStyle: const TextStyle(
@@ -182,7 +180,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Text button theme
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
@@ -193,7 +191,7 @@ class AppTheme {
           ),
         ),
       ),
-      
+
       // Checkbox theme
       checkboxTheme: CheckboxThemeData(
         fillColor: WidgetStateProperty.resolveWith<Color>((states) {
@@ -203,9 +201,7 @@ class AppTheme {
           return silverSand;
         }),
         checkColor: WidgetStateProperty.all(athensGray),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
 
       // Divider theme
@@ -214,11 +210,11 @@ class AppTheme {
         thickness: 1,
         space: 20,
       ),
-      
+
       useMaterial3: true,
     );
   }
-  
+
   // Custom gradient for backgrounds (kept for splash and intro screens)
   static BoxDecoration get gradientBackground {
     return const BoxDecoration(
@@ -249,32 +245,95 @@ class AppTheme {
   }
 
   // Convenience methods for common font weights
-  static TextStyle cairoLight({double fontSize = 16, Color color = mako, double? height}) {
-    return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w300, color: color, height: height);
+  static TextStyle cairoLight({
+    double fontSize = 16,
+    Color color = mako,
+    double? height,
+  }) {
+    return cairoTextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w300,
+      color: color,
+      height: height,
+    );
   }
 
-  static TextStyle cairoRegular({double fontSize = 16, Color color = mako, double? height}) {
-    return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w400, color: color, height: height);
+  static TextStyle cairoRegular({
+    double fontSize = 16,
+    Color color = mako,
+    double? height,
+  }) {
+    return cairoTextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w400,
+      color: color,
+      height: height,
+    );
   }
 
-  static TextStyle cairoMedium({double fontSize = 16, Color color = mako, double? height}) {
-    return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w500, color: color, height: height);
+  static TextStyle cairoMedium({
+    double fontSize = 16,
+    Color color = mako,
+    double? height,
+  }) {
+    return cairoTextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w500,
+      color: color,
+      height: height,
+    );
   }
 
-  static TextStyle cairoSemiBold({double fontSize = 16, Color color = mako, double? height}) {
-    return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w600, color: color, height: height);
+  static TextStyle cairoSemiBold({
+    double fontSize = 16,
+    Color color = mako,
+    double? height,
+  }) {
+    return cairoTextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w600,
+      color: color,
+      height: height,
+    );
   }
 
-  static TextStyle cairoBold({double fontSize = 16, Color color = mako, double? height}) {
-    return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w700, color: color, height: height);
+  static TextStyle cairoBold({
+    double fontSize = 16,
+    Color color = mako,
+    double? height,
+  }) {
+    return cairoTextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w700,
+      color: color,
+      height: height,
+    );
   }
 
-  static TextStyle cairoExtraBold({double fontSize = 16, Color color = mako, double? height}) {
-    return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w800, color: color, height: height);
+  static TextStyle cairoExtraBold({
+    double fontSize = 16,
+    Color color = mako,
+    double? height,
+  }) {
+    return cairoTextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w800,
+      color: color,
+      height: height,
+    );
   }
 
-  static TextStyle cairoBlack({double fontSize = 16, Color color = mako, double? height}) {
-    return cairoTextStyle(fontSize: fontSize, fontWeight: FontWeight.w900, color: color, height: height);
+  static TextStyle cairoBlack({
+    double fontSize = 16,
+    Color color = mako,
+    double? height,
+  }) {
+    return cairoTextStyle(
+      fontSize: fontSize,
+      fontWeight: FontWeight.w900,
+      color: color,
+      height: height,
+    );
   }
 }
 
